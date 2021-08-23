@@ -4,8 +4,8 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CommandAlias;
 import co.aikar.commands.annotation.Default;
 import net.sushiclient.chatcontrol.Utils;
-import net.sushiclient.chatcontrol.data.IgnoreListRepository;
-import net.sushiclient.chatcontrol.data.IgnoreType;
+import net.sushiclient.chatcontrol.data.IgnorationListRepository;
+import net.sushiclient.chatcontrol.data.IgnorationType;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -15,17 +15,17 @@ import org.bukkit.plugin.Plugin;
 public class IgnoreHardCommand extends BaseCommand {
 
     private final Plugin plugin;
-    private final IgnoreListRepository ignoreListRepository;
+    private final IgnorationListRepository ignorationListRepository;
 
-    public IgnoreHardCommand(Plugin plugin, IgnoreListRepository ignoreListRepository) {
+    public IgnoreHardCommand(Plugin plugin, IgnorationListRepository ignorationListRepository) {
         this.plugin = plugin;
-        this.ignoreListRepository = ignoreListRepository;
+        this.ignorationListRepository = ignorationListRepository;
     }
 
     @Default
     public void ignoreHard(Player sender, OfflinePlayer target) {
-        Utils.async(plugin, () -> ignoreListRepository.findByUUID(sender.getUniqueId()), list -> {
-            list.addIgnoreElement(target.getUniqueId(), IgnoreType.HARD);
+        Utils.async(plugin, () -> ignorationListRepository.findByUUID(sender.getUniqueId()), list -> {
+            list.addIgnorationRecord(target.getUniqueId(), IgnorationType.HARD);
             sender.sendMessage(ChatColor.GOLD + "Now permanently ignoring " + ChatColor.DARK_AQUA + target.getName());
 
         });

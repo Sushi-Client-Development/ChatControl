@@ -6,9 +6,10 @@ import com.google.gson.GsonBuilder;
 import net.sushiclient.chatcontrol.commands.IgnoreCommand;
 import net.sushiclient.chatcontrol.commands.IgnoreHardCommand;
 import net.sushiclient.chatcontrol.commands.IgnoreListCommand;
-import net.sushiclient.chatcontrol.data.IgnoreList;
-import net.sushiclient.chatcontrol.data.IgnoreListRepository;
-import net.sushiclient.chatcontrol.data.gson.GsonIgnoreListRepository;
+import net.sushiclient.chatcontrol.data.IgnorationList;
+import net.sushiclient.chatcontrol.data.IgnorationListRepository;
+import net.sushiclient.chatcontrol.data.IgnorationType;
+import net.sushiclient.chatcontrol.data.gson.GsonIgnorationListRepository;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,16 +21,16 @@ import java.io.File;
 
 public class Main extends JavaPlugin implements Listener {
 
-    private IgnoreListRepository ignoreListRepository;
+    private IgnorationListRepository ignorationListRepository;
 
     @Override
     public void onEnable() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        ignoreListRepository = new GsonIgnoreListRepository(gson, this, new File(getDataFolder(), "data"));
+        ignorationListRepository = new GsonIgnorationListRepository(gson, this, new File(getDataFolder(), "data"));
         BukkitCommandManager bukkitCommandManager = new BukkitCommandManager(this);
-        bukkitCommandManager.registerCommand(new IgnoreCommand(this, ignoreListRepository));
-        bukkitCommandManager.registerCommand(new IgnoreHardCommand(this, ignoreListRepository));
-        bukkitCommandManager.registerCommand(new IgnoreListCommand(this, ignoreListRepository));
+        bukkitCommandManager.registerCommand(new IgnoreCommand(this, ignorationListRepository));
+        bukkitCommandManager.registerCommand(new IgnoreHardCommand(this, ignorationListRepository));
+        bukkitCommandManager.registerCommand(new IgnoreListCommand(this, ignorationListRepository));
 
         Bukkit.getPluginManager().registerEvents(this, this);
     }
@@ -37,14 +38,14 @@ public class Main extends JavaPlugin implements Listener {
     @EventHandler
     public void onAsyncPlayerChat(AsyncPlayerChatEvent e) {
         e.getRecipients().removeIf(it ->
-                ignoreListRepository.findByUUID(it.getUniqueId()).isIgnored(e.getPlayer().getUniqueId()));
+                ignorationListRepository.findByUUID(it.getUniqueId()).isIgnored(e.getPlayer().getUniqueId()));
     }
 
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent e) {
         Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
-            IgnoreList ignoreList = ignoreListRepository.findByUUID(e.getPlayer().getUniqueId());
-            ignoreList.clearSoftIgnoreElements();
+            IgnorationList ignorationList = ignorationListRepository.findByUUID(e.getPlayer().getUniqueId());
+            ignorationList.removeIgnorationRecords(IgnorationType.SOFT);
         });
     }
 }

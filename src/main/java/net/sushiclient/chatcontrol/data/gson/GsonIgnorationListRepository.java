@@ -2,8 +2,8 @@ package net.sushiclient.chatcontrol.data.gson;
 
 import com.google.gson.Gson;
 import net.sushiclient.chatcontrol.Utils;
-import net.sushiclient.chatcontrol.data.IgnoreList;
-import net.sushiclient.chatcontrol.data.IgnoreListRepository;
+import net.sushiclient.chatcontrol.data.IgnorationList;
+import net.sushiclient.chatcontrol.data.IgnorationListRepository;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,14 +15,14 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 
-final public class GsonIgnoreListRepository implements IgnoreListRepository, Listener {
+final public class GsonIgnorationListRepository implements IgnorationListRepository, Listener {
 
-    private final Map<UUID, GsonIgnoreList> ignoreLists = Collections.synchronizedMap(new WeakHashMap<>());
+    private final Map<UUID, GsonIgnorationList> ignoreLists = Collections.synchronizedMap(new WeakHashMap<>());
     private final Gson gson;
     private final Plugin plugin;
     private final File baseDir;
 
-    public GsonIgnoreListRepository(Gson gson, Plugin plugin, File baseDir) {
+    public GsonIgnorationListRepository(Gson gson, Plugin plugin, File baseDir) {
         this.gson = gson;
         this.plugin = plugin;
         this.baseDir = baseDir;
@@ -34,28 +34,28 @@ final public class GsonIgnoreListRepository implements IgnoreListRepository, Lis
     }
 
     @Override
-    public IgnoreList findByUUID(UUID owner) {
+    public IgnorationList findByUUID(UUID owner) {
         // search from cached list
-        GsonIgnoreList ignoreList = ignoreLists.get(owner);
+        GsonIgnorationList ignoreList = ignoreLists.get(owner);
         if (ignoreList != null) return ignoreList;
 
         // load if file exists
         File jsonFile = getFileByOwner(owner);
         if (jsonFile.exists()) {
             try {
-                ignoreList = gson.fromJson(Utils.readFile(jsonFile), GsonIgnoreList.class);
+                ignoreList = gson.fromJson(Utils.readFile(jsonFile), GsonIgnorationList.class);
                 ignoreList.onLoad(owner, this::saveIgnoreList);
             } catch (IOException exception) {
                 // re-new json
             }
         } else {
-            ignoreList = new GsonIgnoreList(owner, this::saveIgnoreList, new ArrayList<>());
+            ignoreList = new GsonIgnorationList(owner, this::saveIgnoreList, new ArrayList<>());
         }
         ignoreLists.put(owner, ignoreList);
         return ignoreList;
     }
 
-    void saveIgnoreList(GsonIgnoreList ignoreList) {
+    void saveIgnoreList(GsonIgnorationList ignoreList) {
         File jsonFile = getFileByOwner(ignoreList.getOwner());
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {

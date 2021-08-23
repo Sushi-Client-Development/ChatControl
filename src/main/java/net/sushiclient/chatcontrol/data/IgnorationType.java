@@ -1,5 +1,5 @@
 package net.sushiclient.chatcontrol.data;
 
-public enum IgnoreType {
+public enum IgnorationType {
     SOFT, HARD
 }
