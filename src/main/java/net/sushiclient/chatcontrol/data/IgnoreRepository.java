@@ -3,5 +3,5 @@ package net.sushiclient.chatcontrol.data;
 import java.util.UUID;
 
 public interface IgnoreRepository {
-    IgnoreList findIgnoreList(UUID uuid);
+    IgnoreList findIgnoreList(UUID owner);
 }

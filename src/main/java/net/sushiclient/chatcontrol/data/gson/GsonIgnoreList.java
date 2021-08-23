@@ -4,6 +4,7 @@ import net.sushiclient.chatcontrol.data.IgnoreElement;
 import net.sushiclient.chatcontrol.data.IgnoreList;
 import net.sushiclient.chatcontrol.data.IgnoreType;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -30,7 +31,7 @@ class GsonIgnoreList implements IgnoreList {
 
     @Override
     public List<? extends IgnoreElement> getIgnoreElements() {
-        return ignoreElements;
+        return new ArrayList<>(ignoreElements);
     }
 
     @Override
