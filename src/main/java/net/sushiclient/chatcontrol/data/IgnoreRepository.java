@@ -1,7 +1,7 @@
 package net.sushiclient.chatcontrol.data;
 
-import org.bukkit.entity.Player;
+import java.util.UUID;
 
 public interface IgnoreRepository {
-    IgnoreList findIgnoreList(Player player);
+    IgnoreList findIgnoreList(UUID uuid);
 }
