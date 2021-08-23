@@ -4,16 +4,14 @@ import net.sushiclient.chatcontrol.data.IgnoreElement;
 import net.sushiclient.chatcontrol.data.IgnoreList;
 import net.sushiclient.chatcontrol.data.IgnoreType;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 
 class GsonIgnoreList implements IgnoreList {
 
     private transient UUID owner;
     private transient Consumer<GsonIgnoreList> saveCallback;
-    private List<GsonIgnoreElement> ignoreElements;
+    private Collection<GsonIgnoreElement> ignoreElements;
 
     public GsonIgnoreList() {
     }
@@ -21,7 +19,7 @@ class GsonIgnoreList implements IgnoreList {
     public GsonIgnoreList(UUID owner, Consumer<GsonIgnoreList> saveCallback, List<GsonIgnoreElement> ignoreElements) {
         this.owner = owner;
         this.saveCallback = saveCallback;
-        this.ignoreElements = ignoreElements;
+        this.ignoreElements = Collections.synchronizedCollection(new HashSet<>(ignoreElements));
     }
 
     @Override
@@ -30,8 +28,8 @@ class GsonIgnoreList implements IgnoreList {
     }
 
     @Override
-    public List<? extends IgnoreElement> getIgnoreElements() {
-        return new ArrayList<>(ignoreElements);
+    public Collection<? extends IgnoreElement> getIgnoreElements() {
+        return new HashSet<>(ignoreElements);
     }
 
     @Override
@@ -46,6 +44,12 @@ class GsonIgnoreList implements IgnoreList {
         boolean result = ignoreElements.removeIf(it -> it.getTarget().equals(target));
         saveCallback.accept(this);
         return result;
+    }
+
+    @Override
+    public void clearSoftIgnoreElements() {
+        ignoreElements.removeIf(it -> it.getIgnoreType() == IgnoreType.SOFT);
+        saveCallback.accept(this);
     }
 
     void onLoad(UUID owner, Consumer<GsonIgnoreList> saveCallback) {

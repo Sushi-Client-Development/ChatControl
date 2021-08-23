@@ -1,0 +1,31 @@
+name: ChatControl
+version: 1.0
+main: net.sushiclient.chatcontrol.Main
+commands:
+  ignore:
+    usage: /ignore <player>
+    description: Ignores a player
+    permission: chatcontrol.ignore
+  ignorehard:
+    usage: /ignorehard <player>
+    description: Permanently ignores a player
+    permission: chatcontrol.ignorehard
+  ignorelist:
+    usage: /ignorelist
+    description: Shows all ignored players
+    permission: chatcontrol.ignorelist
+  ignoreremove:
+    usage: /ignoreremove
+    description: Remove a player from the ignore list
+    permission: chatcontrol.ignoreremove
+permissions:
+  chatcontrol.*:
+    default: false
+  chatcontrol.ignore:
+    default: true
+  chatcontrol.ignorehard:
+    default: true
+  chatcontrol.ignorelist:
+    default: true
+  chatcontrol.ignoreremove:
+    default: true

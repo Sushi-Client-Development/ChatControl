@@ -14,15 +14,16 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.bukkit:bukkit:1.12.2-R0.1-SNAPSHOT'
-    implementation 'com.google.code.gson:gson:2.8.8'
+    shadow 'org.bukkit:bukkit:1.12.2-R0.1-SNAPSHOT'
+    shadow 'com.google.code.gson:gson:2.8.8'
     implementation 'co.aikar:acf-bukkit:0.5.0-SNAPSHOT'
 }
 
-
 shadowJar {
-    relocate 'co.aikar.commands', 'net.sushiclient.chatcontrol.acf'
-    relocate 'co.aikar.locales', 'net.sushiclient.chatcontrol.locales'
+    def relocate = { string -> relocate(string, "net.sushiclient.chatcontrol.shadow.${string}") }
+    relocate 'co.aikar'
+    exclude 'LICENSE.txt'
+    exclude 'module-info.class'
     classifier = ''
 }
 
