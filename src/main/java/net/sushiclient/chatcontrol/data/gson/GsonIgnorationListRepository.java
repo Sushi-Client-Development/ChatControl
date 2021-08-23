@@ -17,7 +17,7 @@ import java.util.logging.Level;
 
 final public class GsonIgnorationListRepository implements IgnorationListRepository, Listener {
 
-    private final Map<UUID, GsonIgnorationList> ignoreLists = Collections.synchronizedMap(new WeakHashMap<>());
+    private final Map<UUID, GsonIgnorationList> ignorationLists = Collections.synchronizedMap(new WeakHashMap<>());
     private final Gson gson;
     private final Plugin plugin;
     private final File baseDir;
@@ -36,32 +36,33 @@ final public class GsonIgnorationListRepository implements IgnorationListReposit
     @Override
     public IgnorationList findByUUID(UUID owner) {
         // search from cached list
-        GsonIgnorationList ignoreList = ignoreLists.get(owner);
-        if (ignoreList != null) return ignoreList;
+        GsonIgnorationList ignorationList = ignorationLists.get(owner);
+        if (ignorationList != null) return ignorationList;
 
         // load if file exists
         File jsonFile = getFileByOwner(owner);
         if (jsonFile.exists()) {
             try {
-                ignoreList = gson.fromJson(Utils.readFile(jsonFile), GsonIgnorationList.class);
-                ignoreList.onLoad(owner, this::saveIgnoreList);
+                ignorationList = gson.fromJson(Utils.readFile(jsonFile), GsonIgnorationList.class);
+                ignorationList.onLoad(owner, this::saveIgnoreList);
             } catch (IOException exception) {
                 // re-new json
             }
-        } else {
-            ignoreList = new GsonIgnorationList(owner, this::saveIgnoreList, new ArrayList<>());
         }
-        ignoreLists.put(owner, ignoreList);
-        return ignoreList;
+        if (ignorationList == null) {
+            ignorationList = new GsonIgnorationList(owner, this::saveIgnoreList, new ArrayList<>());
+        }
+        ignorationLists.put(owner, ignorationList);
+        return ignorationList;
     }
 
-    void saveIgnoreList(GsonIgnorationList ignoreList) {
-        File jsonFile = getFileByOwner(ignoreList.getOwner());
+    void saveIgnoreList(GsonIgnorationList ignorationList) {
+        File jsonFile = getFileByOwner(ignorationList.getOwner());
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
-                Utils.writeString(jsonFile, gson.toJson(ignoreList));
+                Utils.writeString(jsonFile, gson.toJson(ignorationList));
             } catch (IOException exception) {
-                String msg = "Could not save IgnoreList for " + ignoreList.getOwner();
+                String msg = "Could not save " + ignorationList.getClass() + " for " + ignorationList.getOwner();
                 plugin.getLogger().log(Level.WARNING, msg, exception);
             }
         });
