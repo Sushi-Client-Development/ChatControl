@@ -33,8 +33,9 @@ final public class GsonIgnorationListRepository implements IgnorationListReposit
         return new File(baseDir, owner + ".json");
     }
 
+    /* This method should be refactored with locks in the future for better performance */
     @Override
-    public IgnorationList findByUUID(UUID owner) {
+    public synchronized IgnorationList findByUUID(UUID owner) {
         // search from cached list
         GsonIgnorationList ignorationList = ignorationLists.get(owner);
         if (ignorationList != null) return ignorationList;
@@ -44,19 +45,19 @@ final public class GsonIgnorationListRepository implements IgnorationListReposit
         if (jsonFile.exists()) {
             try {
                 ignorationList = gson.fromJson(Utils.readFile(jsonFile), GsonIgnorationList.class);
-                ignorationList.onLoad(owner, this::saveIgnoreList);
+                ignorationList.onLoad(owner, this::saveIgnorationList);
             } catch (IOException exception) {
                 // re-new json
             }
         }
         if (ignorationList == null) {
-            ignorationList = new GsonIgnorationList(owner, this::saveIgnoreList, new ArrayList<>());
+            ignorationList = new GsonIgnorationList(owner, this::saveIgnorationList, new ArrayList<>());
         }
         ignorationLists.put(owner, ignorationList);
         return ignorationList;
     }
 
-    void saveIgnoreList(GsonIgnorationList ignorationList) {
+    void saveIgnorationList(GsonIgnorationList ignorationList) {
         File jsonFile = getFileByOwner(ignorationList.getOwner());
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
