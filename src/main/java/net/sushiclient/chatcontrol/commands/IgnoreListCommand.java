@@ -41,14 +41,16 @@ public class IgnoreListCommand extends BaseCommand {
                     ignoreMap.put(offlinePlayer.getName(), ignorationRecord.getIgnorationType());
                 }
             }
+            sender.sendMessage(ChatColor.GOLD + "===== Ignored Players =====");
             for (Map.Entry<String, IgnorationType> entry : ignoreMap.entrySet()) {
                 sender.sendMessage(
                         ChatColor.DARK_AQUA + entry.getKey() + " " +
                                 ChatColor.GRAY + "[" +
                                 ChatColor.GOLD + entry.getValue() +
-                                ChatColor.DARK_AQUA + "]"
+                                ChatColor.GRAY + "]"
                 );
             }
+            sender.sendMessage(ChatColor.GOLD + "=========================");
         });
     }
 }
